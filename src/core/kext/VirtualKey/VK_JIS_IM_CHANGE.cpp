@@ -654,14 +654,15 @@ namespace org_pqrs_KeyRemap4MacBook {
   {
     if (savedInputMode_[SavedInputModeType::CURRENT].get() != SavedInputModeIndex::NONE && savedInputMode_[SavedInputModeType::PREVIOUS].get() != SavedInputModeIndex::NONE) {
       if (savedInputMode_[SavedInputModeType::CURRENT].get() != index) {
-        set_indexes_directly(savedInputMode_[SavedInputModeType::CURRENT].get(), index, SavedInputModeIndex::NONE);
+        savedInputMode_[SavedInputModeType::PREVIOUS].set(savedInputMode_[SavedInputModeType::CURRENT].get());
+        savedInputMode_[SavedInputModeType::CURRENT].set(index);
       }
     } else if (savedInputMode_[SavedInputModeType::CURRENT].get() == SavedInputModeIndex::NONE) {
       if (savedInputMode_[SavedInputModeType::PREVIOUS].get() != index) {
-        set_indexes_directly(SavedInputModeIndex::NONE, index, SavedInputModeIndex::NONE);
+        savedInputMode_[SavedInputModeType::CURRENT].set(index);
       }
     } else {
-      set_indexes_directly(index, SavedInputModeIndex::NONE, SavedInputModeIndex::NONE);
+      savedInputMode_[SavedInputModeType::PREVIOUS].set(index);
     }
   }
 }
