@@ -69,6 +69,7 @@ namespace org_pqrs_KeyRemap4MacBook {
           PREVIOUS,
           CURRENT,
           OTHERS,
+          END_,
         };
       };
 
@@ -147,9 +148,7 @@ namespace org_pqrs_KeyRemap4MacBook {
       static bool omit_initialize_;
       static int case1_pass_restore2_;
 
-      static SavedInputModeIndex::Value pre_index2_;
-      static SavedInputModeIndex::Value cur_index2_;
-      static SavedInputModeIndex::Value others_index2_;
+      static SavedInputModeIndex::Value savedInputMode_[SavedInputModeType::END_];
 
       static int sign_plus_minus2_;
       static int counter_plus_minus2_;
