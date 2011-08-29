@@ -61,6 +61,17 @@ namespace org_pqrs_KeyRemap4MacBook {
         };
       };
 
+      // This enum name may not be suitable.
+      // I named it temporary.
+      class SavedInputModeType {
+      public:
+        enum Value {
+          PREVIOUS,
+          CURRENT,
+          OTHERS,
+        };
+      };
+
       class CallbackType {
       public:
         enum Value {
