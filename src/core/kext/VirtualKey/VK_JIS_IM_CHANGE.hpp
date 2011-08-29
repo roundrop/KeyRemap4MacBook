@@ -59,6 +59,20 @@ namespace org_pqrs_KeyRemap4MacBook {
           FEIS  = 6,
           MAX   = 6,
         };
+
+        SavedInputModeIndex(void) : value_(NONE) {}
+
+        Value get(void) const { return value_; }
+        void set(Value newval) { if (newval != NONE) { value_ = newval; } }
+
+        bool operator==(SavedInputModeIndex other) const { return value_ == other.get(); }
+        bool operator!=(SavedInputModeIndex other) const { return ! (*this == other); }
+
+        bool operator==(Value other) const { return value_ == other; }
+        bool operator!=(Value other) const { return ! (*this == other); }
+
+      private:
+        Value value_;
       };
 
       // This enum name may not be suitable.
@@ -148,7 +162,7 @@ namespace org_pqrs_KeyRemap4MacBook {
       static bool omit_initialize_;
       static int case1_pass_restore2_;
 
-      static SavedInputModeIndex::Value savedInputMode_[SavedInputModeType::END_];
+      static SavedInputModeIndex savedInputMode_[SavedInputModeType::END_];
 
       static int sign_plus_minus2_;
       static int counter_plus_minus2_;

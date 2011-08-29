@@ -19,7 +19,7 @@ namespace org_pqrs_KeyRemap4MacBook {
   // XXX change variable name
   int VirtualKey::VK_JIS_IM_CHANGE::case1_pass_restore2_ = 0;
 
-  VirtualKey::VK_JIS_IM_CHANGE::SavedInputModeIndex::Value VirtualKey::VK_JIS_IM_CHANGE::savedInputMode_[SavedInputModeType::END_];
+  VirtualKey::VK_JIS_IM_CHANGE::SavedInputModeIndex VirtualKey::VK_JIS_IM_CHANGE::savedInputMode_[SavedInputModeType::END_];
 
   int VirtualKey::VK_JIS_IM_CHANGE::sign_plus_minus2_ = -99;
   int VirtualKey::VK_JIS_IM_CHANGE::counter_plus_minus2_ = 0;
@@ -29,10 +29,6 @@ namespace org_pqrs_KeyRemap4MacBook {
   void
   VirtualKey::VK_JIS_IM_CHANGE::initialize(IOWorkLoop& workloop)
   {
-    for (int i = 0; i < SavedInputModeType::END_; ++i) {
-      savedInputMode_[i] = SavedInputModeIndex::NONE;
-    }
-
     restore_timer_.initialize(&workloop, NULL, restore_timer_callback);
   }
 
@@ -496,8 +492,8 @@ namespace org_pqrs_KeyRemap4MacBook {
 
     switch (type) {
       case SeesawType::CUR_PRE:
-        fromIndex = savedInputMode_[SavedInputModeType::CURRENT];
-        toIndex   = savedInputMode_[SavedInputModeType::PREVIOUS];
+        fromIndex = savedInputMode_[SavedInputModeType::CURRENT].get();
+        toIndex   = savedInputMode_[SavedInputModeType::PREVIOUS].get();
         break;
 
       case SeesawType::EISUU_KANA:
@@ -511,57 +507,57 @@ namespace org_pqrs_KeyRemap4MacBook {
         break;
 
       case SeesawType::KANA_OTHERS:
-        if (savedInputMode_[SavedInputModeType::OTHERS] == SavedInputModeIndex::NONE) {
+        if (savedInputMode_[SavedInputModeType::OTHERS].get() == SavedInputModeIndex::NONE) {
           set_indexes_directly(SavedInputModeIndex::NONE, SavedInputModeIndex::NONE, SavedInputModeIndex::KATA);
         }
         fromIndex = SavedInputModeIndex::HIRA;
-        toIndex   = savedInputMode_[SavedInputModeType::OTHERS];
+        toIndex   = savedInputMode_[SavedInputModeType::OTHERS].get();
         break;
 
       case SeesawType::EISUU_OTHERS:
-        if (savedInputMode_[SavedInputModeType::OTHERS] == SavedInputModeIndex::NONE) {
+        if (savedInputMode_[SavedInputModeType::OTHERS].get() == SavedInputModeIndex::NONE) {
           set_indexes_directly(SavedInputModeIndex::NONE, SavedInputModeIndex::NONE, SavedInputModeIndex::KATA);
         }
         fromIndex = SavedInputModeIndex::EISU;
-        toIndex   = savedInputMode_[SavedInputModeType::OTHERS];
+        toIndex   = savedInputMode_[SavedInputModeType::OTHERS].get();
         break;
 
       case SeesawType::NONE:
         return SavedInputModeIndex::NONE;
     }
 
-    if (savedInputMode_[SavedInputModeType::CURRENT] != SavedInputModeIndex::NONE && savedInputMode_[SavedInputModeType::PREVIOUS] != SavedInputModeIndex::NONE) {
+    if (savedInputMode_[SavedInputModeType::CURRENT].get() != SavedInputModeIndex::NONE && savedInputMode_[SavedInputModeType::PREVIOUS].get() != SavedInputModeIndex::NONE) {
       if (type == SeesawType::CUR_PRE) {
         set_indexes_directly(fromIndex, toIndex, SavedInputModeIndex::NONE);
-        return savedInputMode_[SavedInputModeType::CURRENT];
+        return savedInputMode_[SavedInputModeType::CURRENT].get();
       } else {
-        tmp_index = savedInputMode_[SavedInputModeType::CURRENT];
+        tmp_index = savedInputMode_[SavedInputModeType::CURRENT].get();
       }
 
     } else {
       if (type == SeesawType::CUR_PRE) {
-        if (savedInputMode_[SavedInputModeType::PREVIOUS] + 1 > SavedInputModeIndex::MAX) {
+        if (savedInputMode_[SavedInputModeType::PREVIOUS].get() + 1 > SavedInputModeIndex::MAX) {
           set_indexes_directly(SavedInputModeIndex::NONE, SavedInputModeIndex::EISU, SavedInputModeIndex::NONE);
         } else {
-          set_indexes_directly(SavedInputModeIndex::NONE, static_cast<SavedInputModeIndex::Value>(savedInputMode_[SavedInputModeType::PREVIOUS] + 1), SavedInputModeIndex::NONE);
+          set_indexes_directly(SavedInputModeIndex::NONE, static_cast<SavedInputModeIndex::Value>(savedInputMode_[SavedInputModeType::PREVIOUS].get() + 1), SavedInputModeIndex::NONE);
         }
-        return savedInputMode_[SavedInputModeType::CURRENT];
+        return savedInputMode_[SavedInputModeType::CURRENT].get();
       } else {
         tmp_index = toIndex;
       }
     }
-    if (savedInputMode_[SavedInputModeType::CURRENT] != fromIndex) {
+    if (savedInputMode_[SavedInputModeType::CURRENT].get() != fromIndex) {
       set_indexes_directly(tmp_index, fromIndex, SavedInputModeIndex::NONE);
     } else {
       set_indexes_directly(fromIndex, toIndex, SavedInputModeIndex::NONE);
     }
     if (seesaw_init2_) {
-      if (savedInputMode_[SavedInputModeType::CURRENT] != fromIndex) {
-        set_indexes_directly(savedInputMode_[SavedInputModeType::CURRENT], fromIndex, SavedInputModeIndex::NONE);
+      if (savedInputMode_[SavedInputModeType::CURRENT].get() != fromIndex) {
+        set_indexes_directly(savedInputMode_[SavedInputModeType::CURRENT].get(), fromIndex, SavedInputModeIndex::NONE);
       }
       seesaw_init2_ = false;
     }
-    return savedInputMode_[SavedInputModeType::CURRENT];
+    return savedInputMode_[SavedInputModeType::CURRENT].get();
   }
 
   VirtualKey::VK_JIS_IM_CHANGE::SavedInputModeIndex::Value
@@ -570,8 +566,8 @@ namespace org_pqrs_KeyRemap4MacBook {
     SavedInputModeIndex::Value ret;
     SavedInputModeIndex::Value cur_index_tmp, others_index_tmp;
 
-    cur_index_tmp    = savedInputMode_[SavedInputModeType::CURRENT];
-    others_index_tmp = savedInputMode_[SavedInputModeType::OTHERS];
+    cur_index_tmp    = savedInputMode_[SavedInputModeType::CURRENT].get();
+    others_index_tmp = savedInputMode_[SavedInputModeType::OTHERS].get();
 
     bool cond00 = (savedInputMode_[SavedInputModeType::CURRENT] == SavedInputModeIndex::EISU);
     bool cond01 = (savedInputMode_[SavedInputModeType::PREVIOUS] == SavedInputModeIndex::HKAT && savedInputMode_[SavedInputModeType::CURRENT] == SavedInputModeIndex::KATA);
@@ -582,7 +578,7 @@ namespace org_pqrs_KeyRemap4MacBook {
     bool cond13 = (savedInputMode_[SavedInputModeType::PREVIOUS] != SavedInputModeIndex::HKAT && savedInputMode_[SavedInputModeType::CURRENT] == SavedInputModeIndex::KATA);
     bool cond14 = (savedInputMode_[SavedInputModeType::PREVIOUS] == SavedInputModeIndex::KATA && savedInputMode_[SavedInputModeType::CURRENT] == SavedInputModeIndex::HKAT);
     if (replacetype == ReplaceType::SKIP_PREVIOUS) {
-      skip[savedInputMode_[SavedInputModeType::PREVIOUS]] = 1;
+      skip[savedInputMode_[SavedInputModeType::PREVIOUS].get()] = 1;
 
     } else if (replacetype == ReplaceType::SKIP_SPECIFIC) {
       if (sign_plus_minus2_ == -99) {
@@ -648,26 +644,20 @@ namespace org_pqrs_KeyRemap4MacBook {
                                                      SavedInputModeIndex::Value new_cur,
                                                      SavedInputModeIndex::Value new_others)
   {
-    if (new_pre != SavedInputModeIndex::NONE) {
-      savedInputMode_[SavedInputModeType::PREVIOUS]  = new_pre;
-    }
-    if (new_cur != SavedInputModeIndex::NONE) {
-      savedInputMode_[SavedInputModeType::CURRENT] = new_cur;
-    }
-    if (new_others != SavedInputModeIndex::NONE) {
-      savedInputMode_[SavedInputModeType::OTHERS] = new_others;
-    }
+    savedInputMode_[SavedInputModeType::PREVIOUS].set(new_pre);
+    savedInputMode_[SavedInputModeType::CURRENT].set(new_cur);
+    savedInputMode_[SavedInputModeType::OTHERS].set(new_others);
   }
 
   void
   VirtualKey::VK_JIS_IM_CHANGE::set_new_index(SavedInputModeIndex::Value index)
   {
-    if (savedInputMode_[SavedInputModeType::CURRENT] != SavedInputModeIndex::NONE && savedInputMode_[SavedInputModeType::PREVIOUS] != SavedInputModeIndex::NONE) {
-      if (savedInputMode_[SavedInputModeType::CURRENT] != index) {
-        set_indexes_directly(savedInputMode_[SavedInputModeType::CURRENT], index, SavedInputModeIndex::NONE);
+    if (savedInputMode_[SavedInputModeType::CURRENT].get() != SavedInputModeIndex::NONE && savedInputMode_[SavedInputModeType::PREVIOUS].get() != SavedInputModeIndex::NONE) {
+      if (savedInputMode_[SavedInputModeType::CURRENT].get() != index) {
+        set_indexes_directly(savedInputMode_[SavedInputModeType::CURRENT].get(), index, SavedInputModeIndex::NONE);
       }
-    } else if (savedInputMode_[SavedInputModeType::CURRENT] == SavedInputModeIndex::NONE) {
-      if (savedInputMode_[SavedInputModeType::PREVIOUS] != index) {
+    } else if (savedInputMode_[SavedInputModeType::CURRENT].get() == SavedInputModeIndex::NONE) {
+      if (savedInputMode_[SavedInputModeType::PREVIOUS].get() != index) {
         set_indexes_directly(SavedInputModeIndex::NONE, index, SavedInputModeIndex::NONE);
       }
     } else {
