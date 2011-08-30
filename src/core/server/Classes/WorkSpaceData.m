@@ -316,6 +316,10 @@
     return [parser keycode:@"ApplicationType::PULP"];
   }
 
+  if ([name hasPrefix:@"org.netbeans.ide.baseide"]) {
+    return [parser keycode:@"ApplicationType::NETBEANS"];
+  }
+
   return [parser keycode:@"ApplicationType::UNKNOWN"];
 }
 
